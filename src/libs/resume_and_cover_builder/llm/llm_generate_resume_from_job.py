@@ -3,6 +3,7 @@ Create a class that generates a job description based on a resume and a job desc
 """
 # app/libs/resume_and_cover_builder/llm_generate_resume_from_job.py
 import os
+import sys
 from src.libs.resume_and_cover_builder.llm.llm_generate_resume import LLMResumer
 from src.libs.resume_and_cover_builder.utils import LoggerChatModel
 from langchain_core.output_parsers import StrOutputParser
@@ -11,6 +12,9 @@ from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 from loguru import logger
 from pathlib import Path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+from config import LLM_MODEL, LLM_API_URL, LLM_MODEL_TYPE
+from langchain_ollama.llms import OllamaLLM
 
 # Load environment variables from .env file
 load_dotenv()
@@ -23,6 +27,10 @@ logger.add(log_path / "gpt_resum_job_descr.log", rotation="1 day", compression="
 
 class LLMResumeJobDescription(LLMResumer):
     def __init__(self, openai_api_key, strings):
+        if LLM_MODEL_TYPE == 'ollama':
+            self.llm_cheap = OllamaLLM(model=LLM_MODEL, base_url=LLM_API_URL)
+        else:
+            self.llm_cheap = ChatOpenAI(api_key=openai_api_key)
         super().__init__(openai_api_key, strings)
 
     def set_job_description_from_text(self, job_description_text) -> None:

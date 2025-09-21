@@ -3,6 +3,7 @@ Create a class that generates a resume based on a resume and a resume template.
 """
 # app/libs/resume_and_cover_builder/gpt_resume.py
 import os
+import sys
 import textwrap
 from src.libs.resume_and_cover_builder.utils import LoggerChatModel
 from langchain_core.output_parsers import StrOutputParser
@@ -12,6 +13,9 @@ from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from loguru import logger
 from pathlib import Path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+from config import LLM_MODEL, LLM_API_URL, LLM_MODEL_TYPE
+from langchain_ollama.llms import OllamaLLM
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,11 +29,14 @@ logger.add(log_path / "gpt_resume.log", rotation="1 day", compression="zip", ret
 
 class LLMResumer:
     def __init__(self, openai_api_key, strings):
-        self.llm_cheap = LoggerChatModel(
-            ChatOpenAI(
-                model_name="gpt-4o-mini", openai_api_key=openai_api_key, temperature=0.4
+        if LLM_MODEL_TYPE == 'ollama':
+            self.llm_cheap = OllamaLLM(model=LLM_MODEL, base_url=LLM_API_URL)
+        else:
+            self.llm_cheap = LoggerChatModel(
+                ChatOpenAI(
+                    model_name="gpt-4o-mini", openai_api_key=openai_api_key, temperature=0.4
+                )
             )
-        )
         self.strings = strings
 
     @staticmethod

@@ -25,7 +25,7 @@ from src.utils.constants import (
 # from ai_hawk.bot_facade import AIHawkBotFacade
 # from ai_hawk.job_manager import AIHawkJobManager
 # from ai_hawk.llm.llm_manager import GPTAnswerer
-
+from config import LLM_MODEL_TYPE, LLM_MODEL, LLM_API_URL
 
 class ConfigError(Exception):
     """Custom exception for configuration-related errors."""
@@ -524,6 +524,31 @@ def prompt_user_action() -> str:
         return ""
 
 
+def check_llm_status(llm_api_key: str) -> bool:
+    """
+    Check if the LLM (Language Learning Model) is working by making a simple API call.
+
+    :param llm_api_key: API key for the LLM service.
+    :return: True if the LLM is working, False otherwise.
+    """
+    try:
+        # Example of a simple API call to check LLM status
+        if LLM_MODEL_TYPE == 'ollama':
+            from langchain_ollama import OllamaLLM
+            llm = OllamaLLM(model=LLM_MODEL, api_url=LLM_API_URL)
+            
+            response = llm.invoke("Say 'Hello from Ollama with LangChain!'")
+            if response and isinstance(response, str) and len(response) > 0:
+                print(f"LLM is operational. {response}")
+                return True
+            else:
+                print("LLM did not return a valid response.")
+                return False
+    except Exception as e:
+        logger.exception(f"An error occurred while checking LLM status: {e}")
+        return False
+
+
 def main():
     """Main entry point for the AIHawk Job Application Bot."""
     try:
@@ -534,6 +559,11 @@ def main():
         # Validate configuration and secrets
         config = ConfigValidator.validate_config(config_file)
         llm_api_key = ConfigValidator.validate_secrets(secrets_file)
+
+        # Check LLM status
+        if not check_llm_status(llm_api_key):
+            logger.error("LLM is not operational. Please check the LLM service.")
+            return
 
         # Prepare parameters
         config["uploads"] = FileManager.get_uploads(plain_text_resume_file)
