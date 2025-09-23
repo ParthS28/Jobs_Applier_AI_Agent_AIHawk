@@ -6,7 +6,7 @@ from src.utils.constants import DEBUG, ERROR, LLM_MODEL, OPENAI
 LOG_LEVEL = 'ERROR'
 LOG_SELENIUM_LEVEL = ERROR
 LOG_TO_FILE = True
-LOG_TO_CONSOLE = True
+LOG_TO_CONSOLE = False
 
 MINIMUM_WAIT_TIME_IN_SECONDS = 60
 
@@ -17,6 +17,6 @@ JOB_MAX_APPLICATIONS = 5
 JOB_MIN_APPLICATIONS = 1
 
 LLM_MODEL_TYPE = 'ollama'
-LLM_MODEL = 'llama3'
+LLM_MODEL = 'llama3.1'
 # Only required for OLLAMA models
 LLM_API_URL = 'http://localhost:11434'

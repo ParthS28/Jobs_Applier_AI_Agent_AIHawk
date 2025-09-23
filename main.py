@@ -561,9 +561,9 @@ def main():
         llm_api_key = ConfigValidator.validate_secrets(secrets_file)
 
         # Check LLM status
-        if not check_llm_status(llm_api_key):
-            logger.error("LLM is not operational. Please check the LLM service.")
-            return
+        # if not check_llm_status(llm_api_key):
+        #     logger.error("LLM is not operational. Please check the LLM service.")
+        #     return
 
         # Prepare parameters
         config["uploads"] = FileManager.get_uploads(plain_text_resume_file)

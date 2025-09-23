@@ -124,6 +124,7 @@ class ResumeFacade:
             raise ValueError("You must choose a style before generating the PDF.")
         
         html_resume = self.resume_generator.create_resume(style_path)
+        
         result = HTML_to_PDF(html_resume, self.driver)
         self.driver.quit()
         return result
